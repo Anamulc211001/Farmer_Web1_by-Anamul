@@ -398,7 +398,7 @@ function App() {
               <div className="flex items-center mb-4">
                 <div className="bg-yellow-400/20 p-2 sm:p-3 rounded-full mr-3 sm:mr-4 animate-pulse-scale">
                   {weatherLoading ? (
-                    <LoadingSpinner size="sm" color="text-yellow-300" />
+                    <LoadingSpinner size="sm\" color="text-yellow-300" />
                   ) : (
                     <Sun className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-300 animate-float" />
                   )}
@@ -476,7 +476,7 @@ function App() {
               </div>
               <div className="space-y-2 sm:space-y-3">
                 {marketLoading ? (
-                  <LoadingSpinner size="sm" color="text-green-300" />
+                  <LoadingSpinner size="sm\" color="text-green-300" />
                 ) : (
                   prices.slice(0, 3).map((price, index) => (
                     <div key={index} className="flex items-center justify-between animate-fade-in-up" style={{animationDelay: `${3 + index * 0.2}s`}}>
