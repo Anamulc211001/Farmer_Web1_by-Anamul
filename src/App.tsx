@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Home, 
   Cloud, 
@@ -37,8 +37,18 @@ import LoadingSpinner from './components/LoadingSpinner';
 
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [animationPhase, setAnimationPhase] = useState(0);
   const { weather, loading: weatherLoading, alerts, refetch: refetchWeather } = useWeather();
   const { prices, loading: marketLoading, refetch: refetchMarket } = useMarket();
+
+  // Animation cycle for hero text
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimationPhase(prev => (prev + 1) % 3); // Cycle through 3 animation phases
+    }, 4000); // Change animation every 4 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -63,49 +73,198 @@ function App() {
     }
   };
 
+  const getAnimationClass = (phase: number) => {
+    switch (phase) {
+      case 0:
+        return 'animate-fade-in-up';
+      case 1:
+        return 'animate-bounce-in';
+      case 2:
+        return 'animate-slide-in-right';
+      default:
+        return 'animate-fade-in-up';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Custom CSS for animations */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes bounceIn {
+          0% {
+            opacity: 0;
+            transform: scale(0.3);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.05);
+          }
+          70% {
+            transform: scale(0.9);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes slideInRight {
+          0% {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes typewriter {
+          0% {
+            width: 0;
+          }
+          100% {
+            width: 100%;
+          }
+        }
+
+        @keyframes blink {
+          0%, 50% {
+            border-color: transparent;
+          }
+          51%, 100% {
+            border-color: #fbbf24;
+          }
+        }
+
+        @keyframes glow {
+          0%, 100% {
+            text-shadow: 0 0 5px rgba(251, 191, 36, 0.5), 0 0 10px rgba(251, 191, 36, 0.3), 0 0 15px rgba(251, 191, 36, 0.2);
+          }
+          50% {
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.6), 0 0 30px rgba(251, 191, 36, 0.4);
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+
+        @keyframes pulse-scale {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+
+        .animate-fade-in-up {
+          animation: fadeInUp 1.2s ease-out forwards;
+        }
+
+        .animate-bounce-in {
+          animation: bounceIn 1.5s ease-out forwards;
+        }
+
+        .animate-slide-in-right {
+          animation: slideInRight 1s ease-out forwards;
+        }
+
+        .animate-typewriter {
+          overflow: hidden;
+          border-right: 3px solid #fbbf24;
+          white-space: nowrap;
+          animation: typewriter 3s steps(40) forwards, blink 1s infinite;
+        }
+
+        .animate-glow {
+          animation: glow 2s ease-in-out infinite;
+        }
+
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-pulse-scale {
+          animation: pulse-scale 2s ease-in-out infinite;
+        }
+
+        .text-gradient {
+          background: linear-gradient(45deg, #fbbf24, #f59e0b, #d97706);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .text-shadow-glow {
+          text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        }
+
+        /* Staggered animation for individual words */
+        .word-1 { animation-delay: 0s; }
+        .word-2 { animation-delay: 0.2s; }
+        .word-3 { animation-delay: 0.4s; }
+        .word-4 { animation-delay: 0.6s; }
+      `}</style>
+
       {/* Navigation Bar */}
       <nav className="bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
-              <Wheat className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+              <Wheat className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 animate-float" />
               <span className="text-green-800 font-bold text-base sm:text-lg">কৃষক সহায়ক</span>
             </div>
             
             <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
               <button 
                 onClick={() => scrollToSection('home')}
-                className="text-gray-700 hover:text-green-600 transition-colors flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50"
+                className="text-gray-700 hover:text-green-600 transition-all duration-300 flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50 hover:scale-105"
               >
                 <Home className="h-4 w-4" />
                 <span>হোম / Home</span>
               </button>
               <button 
                 onClick={() => scrollToSection('weather')}
-                className="text-gray-700 hover:text-green-600 transition-colors flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50"
+                className="text-gray-700 hover:text-green-600 transition-all duration-300 flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50 hover:scale-105"
               >
                 <Cloud className="h-4 w-4" />
                 <span>আবহাওয়া / Weather</span>
               </button>
               <button 
                 onClick={() => scrollToSection('crops')}
-                className="text-gray-700 hover:text-green-600 transition-colors flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50"
+                className="text-gray-700 hover:text-green-600 transition-all duration-300 flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50 hover:scale-105"
               >
                 <Wheat className="h-4 w-4" />
                 <span>ফসল / Crops</span>
               </button>
               <button 
                 onClick={() => scrollToSection('market')}
-                className="text-gray-700 hover:text-green-600 transition-colors flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50"
+                className="text-gray-700 hover:text-green-600 transition-all duration-300 flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50 hover:scale-105"
               >
                 <TrendingUp className="h-4 w-4" />
                 <span>বাজার / Market</span>
               </button>
               <button 
                 onClick={() => scrollToSection('support')}
-                className="text-gray-700 hover:text-green-600 transition-colors flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50"
+                className="text-gray-700 hover:text-green-600 transition-all duration-300 flex items-center space-x-2 font-medium text-sm lg:text-base px-2 py-1 rounded-md hover:bg-green-50 hover:scale-105"
               >
                 <HelpCircle className="h-4 w-4" />
                 <span>সহায়তা / Support</span>
@@ -116,7 +275,7 @@ function App() {
             <div className="md:hidden">
               <button 
                 onClick={toggleMobileMenu}
-                className="text-gray-700 hover:text-green-600 p-2 rounded-md hover:bg-green-50 transition-colors"
+                className="text-gray-700 hover:text-green-600 p-2 rounded-md hover:bg-green-50 transition-all duration-300 hover:scale-110"
               >
                 {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -126,35 +285,35 @@ function App() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white/98 backdrop-blur-md border-t border-gray-200 shadow-lg">
+          <div className="md:hidden bg-white/98 backdrop-blur-md border-t border-gray-200 shadow-lg animate-fade-in-up">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <button 
                 onClick={() => scrollToSection('home')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-colors"
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-all duration-300 hover:scale-105"
               >
                 হোম / Home
               </button>
               <button 
                 onClick={() => scrollToSection('weather')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-colors"
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-all duration-300 hover:scale-105"
               >
                 আবহাওয়া / Weather
               </button>
               <button 
                 onClick={() => scrollToSection('crops')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-colors"
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-all duration-300 hover:scale-105"
               >
                 ফসল / Crops
               </button>
               <button 
                 onClick={() => scrollToSection('market')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-colors"
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-all duration-300 hover:scale-105"
               >
                 বাজার / Market
               </button>
               <button 
                 onClick={() => scrollToSection('support')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-colors"
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md font-medium transition-all duration-300 hover:scale-105"
               >
                 সহায়তা / Support
               </button>
@@ -173,41 +332,75 @@ function App() {
           }}
         />
         
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 w-20 h-20 bg-yellow-300/20 rounded-full animate-float" style={{animationDelay: '0s'}}></div>
+          <div className="absolute top-40 right-20 w-16 h-16 bg-green-300/20 rounded-full animate-float" style={{animationDelay: '1s'}}></div>
+          <div className="absolute bottom-40 left-20 w-12 h-12 bg-yellow-400/30 rounded-full animate-float" style={{animationDelay: '2s'}}></div>
+        </div>
+        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-20">
           <div className="text-center mb-8 sm:mb-12">
-            {/* Main Heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-              <span className="block text-yellow-200 mb-2">স্মার্ট তথ্য দিয়ে</span>
-              <span className="block">সফল চাষ</span>
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl text-white/90 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
-              Successful Farming with Smart Data
-            </p>
-            <p className="text-base sm:text-lg text-white/80 mb-8 sm:mb-12 max-w-4xl mx-auto px-4">
+            {/* Animated Main Heading */}
+            <div className="mb-4 sm:mb-6">
+              {/* First Line - Animated */}
+              <div className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-2">
+                <span className={`inline-block text-gradient animate-glow ${getAnimationClass(animationPhase)} word-1`}>
+                  স্মার্ট
+                </span>
+                <span className="text-white mx-2 sm:mx-4">
+                  <span className={`inline-block ${getAnimationClass(animationPhase)} word-2`}>তথ্য</span>
+                </span>
+                <span className={`inline-block text-yellow-200 text-shadow-glow ${getAnimationClass(animationPhase)} word-3`}>
+                  দিয়ে
+                </span>
+              </div>
+              
+              {/* Second Line - Different Animation */}
+              <div className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
+                <span className={`inline-block text-white animate-pulse-scale ${getAnimationClass((animationPhase + 1) % 3)} word-4`}>
+                  সফল চাষ
+                </span>
+              </div>
+            </div>
+
+            {/* Subtitle with Typewriter Effect */}
+            <div className="text-lg sm:text-xl md:text-2xl text-white/90 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
+              <span className={animationPhase === 2 ? 'animate-typewriter' : ''}>
+                Successful Farming with Smart Data
+              </span>
+            </div>
+
+            {/* Description with Fade Animation */}
+            <p className="text-base sm:text-lg text-white/80 mb-8 sm:mb-12 max-w-4xl mx-auto px-4 animate-fade-in-up" style={{animationDelay: '1s'}}>
               আপনার স্থানীয় আবহাওয়া, ফসলের যত্ন এবং বাজারের সর্বশেষ দাম জানুন। 
               <br className="hidden sm:block" />
               Get localized weather forecasts, crop care tips, and current market prices.
             </p>
 
-            {/* CTA Button */}
+            {/* Animated CTA Button */}
             <button 
               onClick={() => scrollToSection('weather')}
-              className="bg-yellow-400 hover:bg-yellow-300 text-green-900 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-base sm:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="bg-yellow-400 hover:bg-yellow-300 text-green-900 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-base sm:text-lg transition-all duration-500 transform hover:scale-110 shadow-lg hover:shadow-2xl animate-bounce-in animate-pulse-scale"
+              style={{animationDelay: '1.5s'}}
             >
-              আজকের আবহাওয়া দেখুন / Check Today's Weather
+              <span className="flex items-center space-x-2">
+                <Zap className="h-5 w-5 animate-float" />
+                <span>আজকের আবহাওয়া দেখুন / Check Today's Weather</span>
+              </span>
             </button>
           </div>
 
-          {/* Information Cards */}
+          {/* Information Cards with Staggered Animation */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Weather Card */}
-            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 hover:bg-white/20 transition-all duration-300">
+            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:rotate-1 animate-fade-in-up" style={{animationDelay: '2s'}}>
               <div className="flex items-center mb-4">
-                <div className="bg-yellow-400/20 p-2 sm:p-3 rounded-full mr-3 sm:mr-4">
+                <div className="bg-yellow-400/20 p-2 sm:p-3 rounded-full mr-3 sm:mr-4 animate-pulse-scale">
                   {weatherLoading ? (
-                    <LoadingSpinner size="sm\" color="text-yellow-300" />
+                    <LoadingSpinner size="sm" color="text-yellow-300" />
                   ) : (
-                    <Sun className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-300" />
+                    <Sun className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-300 animate-float" />
                   )}
                 </div>
                 <div>
@@ -218,16 +411,16 @@ function App() {
               <div className="space-y-2 sm:space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-white/90 flex items-center text-sm">
-                    <Thermometer className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                    <Thermometer className="h-3 w-3 sm:h-4 sm:w-4 mr-2 animate-pulse" />
                     তাপমাত্রা / Temp
                   </span>
-                  <span className="text-white font-semibold text-sm">
+                  <span className="text-white font-semibold text-sm animate-glow">
                     {weatherLoading ? '...' : `${weather?.temperature || 32}°C`}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-white/90 flex items-center text-sm">
-                    <Wind className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                    <Wind className="h-3 w-3 sm:h-4 sm:w-4 mr-2 animate-pulse" />
                     বাতাস / Wind
                   </span>
                   <span className="text-white font-semibold text-sm">
@@ -236,7 +429,7 @@ function App() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-white/90 flex items-center text-sm">
-                    <Droplets className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                    <Droplets className="h-3 w-3 sm:h-4 sm:w-4 mr-2 animate-pulse" />
                     আর্দ্রতা / Humidity
                   </span>
                   <span className="text-white font-semibold text-sm">
@@ -247,10 +440,10 @@ function App() {
             </div>
 
             {/* Soil Moisture Card */}
-            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 hover:bg-white/20 transition-all duration-300">
+            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:-rotate-1 animate-fade-in-up" style={{animationDelay: '2.3s'}}>
               <div className="flex items-center mb-4">
-                <div className="bg-blue-400/20 p-2 sm:p-3 rounded-full mr-3 sm:mr-4">
-                  <Droplets className="h-6 w-6 sm:h-8 sm:w-8 text-blue-300" />
+                <div className="bg-blue-400/20 p-2 sm:p-3 rounded-full mr-3 sm:mr-4 animate-pulse-scale">
+                  <Droplets className="h-6 w-6 sm:h-8 sm:w-8 text-blue-300 animate-float" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-base sm:text-lg">মাটির আর্দ্রতা</h3>
@@ -258,10 +451,10 @@ function App() {
                 </div>
               </div>
               <div className="space-y-2 sm:space-y-3">
-                <div className="bg-white/10 rounded-full h-2 sm:h-3 mb-2">
-                  <div className="bg-blue-400 h-2 sm:h-3 rounded-full transition-all duration-1000" style={{width: '68%'}}></div>
+                <div className="bg-white/10 rounded-full h-2 sm:h-3 mb-2 overflow-hidden">
+                  <div className="bg-blue-400 h-2 sm:h-3 rounded-full transition-all duration-2000 animate-pulse" style={{width: '68%'}}></div>
                 </div>
-                <p className="text-white font-semibold text-center text-sm">68% - ভালো / Good</p>
+                <p className="text-white font-semibold text-center text-sm animate-glow">68% - ভালো / Good</p>
                 <p className="text-white/80 text-xs sm:text-sm text-center">
                   ধানের জন্য উপযুক্ত
                   <br />
@@ -271,10 +464,10 @@ function App() {
             </div>
 
             {/* Market Prices Card */}
-            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 hover:bg-white/20 transition-all duration-300">
+            <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105 hover:rotate-1 animate-fade-in-up" style={{animationDelay: '2.6s'}}>
               <div className="flex items-center mb-4">
-                <div className="bg-green-400/20 p-2 sm:p-3 rounded-full mr-3 sm:mr-4">
-                  <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-300" />
+                <div className="bg-green-400/20 p-2 sm:p-3 rounded-full mr-3 sm:mr-4 animate-pulse-scale">
+                  <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-300 animate-float" />
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-base sm:text-lg">বাজারের দাম</h3>
@@ -283,12 +476,12 @@ function App() {
               </div>
               <div className="space-y-2 sm:space-y-3">
                 {marketLoading ? (
-                  <LoadingSpinner size="sm\" color="text-green-300" />
+                  <LoadingSpinner size="sm" color="text-green-300" />
                 ) : (
                   prices.slice(0, 3).map((price, index) => (
-                    <div key={index} className="flex items-center justify-between">
+                    <div key={index} className="flex items-center justify-between animate-fade-in-up" style={{animationDelay: `${3 + index * 0.2}s`}}>
                       <span className="text-white/90 text-sm">{price.cropBangla} / {price.crop}</span>
-                      <span className="text-green-300 font-semibold text-sm">৳{price.todayPrice}/{price.unit}</span>
+                      <span className="text-green-300 font-semibold text-sm animate-glow">৳{price.todayPrice}/{price.unit}</span>
                     </div>
                   ))
                 )}
@@ -296,33 +489,33 @@ function App() {
             </div>
           </div>
 
-          {/* Additional Info Section */}
-          <div className="mt-12 sm:mt-16 text-center">
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border border-white/20">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4">
+          {/* Additional Info Section with Enhanced Animation */}
+          <div className="mt-12 sm:mt-16 text-center animate-fade-in-up" style={{animationDelay: '3.5s'}}>
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border border-white/20 hover:bg-white/15 transition-all duration-500 transform hover:scale-105">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 animate-glow">
                 আপনার চাষাবাদকে করুন আরো লাভজনক
               </h2>
-              <p className="text-white/90 text-base sm:text-lg mb-6">
+              <p className="text-white/90 text-base sm:text-lg mb-6 animate-typewriter">
                 Make Your Farming More Profitable
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-8">
-                <div className="text-center">
-                  <div className="bg-yellow-400/20 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
-                    <Cloud className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-300" />
+                <div className="text-center animate-bounce-in" style={{animationDelay: '4s'}}>
+                  <div className="bg-yellow-400/20 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center animate-pulse-scale">
+                    <Cloud className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-300 animate-float" />
                   </div>
                   <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">সঠিক পূর্বাভাস</h3>
                   <p className="text-white/80 text-xs sm:text-sm">Accurate Forecasts</p>
                 </div>
-                <div className="text-center">
-                  <div className="bg-green-400/20 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
-                    <Wheat className="h-6 w-6 sm:h-8 sm:w-8 text-green-300" />
+                <div className="text-center animate-bounce-in" style={{animationDelay: '4.3s'}}>
+                  <div className="bg-green-400/20 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center animate-pulse-scale">
+                    <Wheat className="h-6 w-6 sm:h-8 sm:w-8 text-green-300 animate-float" />
                   </div>
                   <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">ফসলের পরিচর্যা</h3>
                   <p className="text-white/80 text-xs sm:text-sm">Crop Care Tips</p>
                 </div>
-                <div className="text-center">
-                  <div className="bg-blue-400/20 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
-                    <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-blue-300" />
+                <div className="text-center animate-bounce-in" style={{animationDelay: '4.6s'}}>
+                  <div className="bg-blue-400/20 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center animate-pulse-scale">
+                    <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-blue-300 animate-float" />
                   </div>
                   <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">বাজার তথ্য</h3>
                   <p className="text-white/80 text-xs sm:text-sm">Market Information</p>
@@ -343,7 +536,7 @@ function App() {
               </h2>
               <button
                 onClick={refetchWeather}
-                className="ml-4 p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors"
+                className="ml-4 p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-all duration-300 hover:scale-110 hover:rotate-180"
                 title="Refresh Weather Data"
               >
                 <RefreshCw className="h-5 w-5" />
@@ -365,11 +558,11 @@ function App() {
               {weather?.forecast.slice(0, 4).map((forecast, index) => {
                 const IconComponent = getWeatherIcon(forecast.icon);
                 return (
-                  <div key={index} className="bg-white rounded-xl p-3 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+                  <div key={index} className="bg-white rounded-xl p-3 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-rotate-1">
                     <div className="text-center">
-                      <IconComponent className="h-8 w-8 sm:h-12 sm:w-12 text-blue-500 mx-auto mb-2 sm:mb-3" />
+                      <IconComponent className="h-8 w-8 sm:h-12 sm:w-12 text-blue-500 mx-auto mb-2 sm:mb-3 animate-float" />
                       <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-xs sm:text-base">{forecast.dayName}</h3>
-                      <p className="text-lg sm:text-2xl font-bold text-gray-900 mb-1">{forecast.temperature}°C</p>
+                      <p className="text-lg sm:text-2xl font-bold text-gray-900 mb-1 animate-glow">{forecast.temperature}°C</p>
                       <p className="text-gray-600 text-xs sm:text-sm">{forecast.condition}</p>
                     </div>
                   </div>
@@ -380,9 +573,9 @@ function App() {
 
           {/* Weather Alerts */}
           {alerts.length > 0 && (
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 sm:p-6 rounded-lg">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 sm:p-6 rounded-lg animate-bounce-in">
               <div className="flex items-start">
-                <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600 mr-3 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600 mr-3 flex-shrink-0 mt-0.5 animate-pulse" />
                 <div>
                   <h3 className="text-base sm:text-lg font-semibold text-yellow-800">
                     আবহাওয়া সতর্কতা / Weather Alert
@@ -437,10 +630,10 @@ function App() {
                 color: 'orange'
               }
             ].map((crop, index) => (
-              <div key={index} className="bg-white rounded-xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+              <div key={index} className="bg-white rounded-xl p-4 sm:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 <div className="flex items-center mb-4">
-                  <div className={`bg-${crop.color}-100 p-2 sm:p-3 rounded-full mr-3 sm:mr-4`}>
-                    <Wheat className={`h-6 w-6 sm:h-8 sm:w-8 text-${crop.color}-600`} />
+                  <div className={`bg-${crop.color}-100 p-2 sm:p-3 rounded-full mr-3 sm:mr-4 animate-pulse-scale`}>
+                    <Wheat className={`h-6 w-6 sm:h-8 sm:w-8 text-${crop.color}-600 animate-float`} />
                   </div>
                   <div>
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900">{crop.title}</h3>
@@ -453,7 +646,7 @@ function App() {
                 <ul className="space-y-2">
                   {crop.tips.map((tip, tipIndex) => (
                     <li key={tipIndex} className="flex items-start">
-                      <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0 animate-pulse" />
                       <span className="text-gray-700 text-xs sm:text-sm">{tip}</span>
                     </li>
                   ))}
@@ -468,20 +661,20 @@ function App() {
               কৃষি ক্যালেন্ডার / Agricultural Calendar
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-              <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg">
-                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 mx-auto mb-3" />
+              <div className="text-center p-3 sm:p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-all duration-300 transform hover:scale-105">
+                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 mx-auto mb-3 animate-float" />
                 <h4 className="font-semibold text-green-800 mb-2 text-sm sm:text-base">খরিফ মৌসুম / Kharif Season</h4>
                 <p className="text-green-700 text-xs sm:text-sm">এপ্রিল - সেপ্টেম্বর<br />April - September</p>
                 <p className="text-green-600 text-xs sm:text-sm mt-2">ধান, পাট, তুলা<br />Rice, Jute, Cotton</p>
               </div>
-              <div className="text-center p-3 sm:p-4 bg-yellow-50 rounded-lg">
-                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600 mx-auto mb-3" />
+              <div className="text-center p-3 sm:p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-all duration-300 transform hover:scale-105">
+                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600 mx-auto mb-3 animate-float" />
                 <h4 className="font-semibold text-yellow-800 mb-2 text-sm sm:text-base">রবি মৌসুম / Rabi Season</h4>
                 <p className="text-yellow-700 text-xs sm:text-sm">অক্টোবর - মার্চ<br />October - March</p>
                 <p className="text-yellow-600 text-xs sm:text-sm mt-2">গম, ভুট্টা, সরিষা<br />Wheat, Corn, Mustard</p>
               </div>
-              <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg">
-                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mx-auto mb-3" />
+              <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-all duration-300 transform hover:scale-105">
+                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mx-auto mb-3 animate-float" />
                 <h4 className="font-semibold text-blue-800 mb-2 text-sm sm:text-base">জায়িদ মৌসুম / Zaid Season</h4>
                 <p className="text-blue-700 text-xs sm:text-sm">মার্চ - জুন<br />March - June</p>
                 <p className="text-blue-600 text-xs sm:text-sm mt-2">তরমুজ, শসা, ভুট্টা<br />Watermelon, Cucumber, Corn</p>
@@ -501,7 +694,7 @@ function App() {
               </h2>
               <button
                 onClick={refetchMarket}
-                className="ml-4 p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-full transition-colors"
+                className="ml-4 p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-full transition-all duration-300 hover:scale-110 hover:rotate-180"
                 title="Refresh Market Data"
               >
                 <RefreshCw className="h-5 w-5" />
@@ -515,7 +708,7 @@ function App() {
           </div>
 
           {/* Price Table */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 mb-8 sm:mb-12">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 mb-8 sm:mb-12 hover:shadow-xl transition-shadow duration-300">
             <div className="bg-green-600 text-white p-3 sm:p-4">
               <h3 className="text-lg sm:text-xl font-bold">আজকের দাম / Today's Prices</h3>
             </div>
@@ -544,7 +737,7 @@ function App() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {prices.map((item, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index} className="hover:bg-gray-50 transition-colors duration-200">
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                           <div>
                             <div className="font-semibold">{item.cropBangla}</div>
@@ -562,8 +755,8 @@ function App() {
                             item.trend === 'up' ? 'text-green-600' : 
                             item.trend === 'down' ? 'text-red-600' : 'text-gray-600'
                           }`}>
-                            {item.trend === 'up' && <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 transform rotate-90" />}
-                            {item.trend === 'down' && <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 transform -rotate-90" />}
+                            {item.trend === 'up' && <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 transform rotate-90 animate-bounce" />}
+                            {item.trend === 'down' && <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 transform -rotate-90 animate-bounce" />}
                             {item.change >= 0 ? '+' : ''}৳{item.change}
                           </span>
                         </td>
@@ -577,35 +770,35 @@ function App() {
 
           {/* Market Tips */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-            <div className="bg-green-50 rounded-xl p-4 sm:p-6 border border-green-200">
+            <div className="bg-green-50 rounded-xl p-4 sm:p-6 border border-green-200 hover:bg-green-100 transition-all duration-300 transform hover:scale-105">
               <div className="flex items-center mb-4">
-                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 mr-3" />
+                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 mr-3 animate-float" />
                 <h3 className="text-lg sm:text-xl font-bold text-green-800">বিক্রয়ের সুযোগ / Selling Opportunities</h3>
               </div>
               <ul className="space-y-2 sm:space-y-3">
                 <li className="flex items-start">
-                  <Star className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <Star className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0 animate-pulse" />
                   <span className="text-green-700 text-sm sm:text-base">ধানের দাম বৃদ্ধি পেয়েছে - বিক্রয়ের ভালো সময়</span>
                 </li>
                 <li className="flex items-start">
-                  <Star className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <Star className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0 animate-pulse" />
                   <span className="text-green-700 text-sm sm:text-base">Rice prices have increased - good time to sell</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-blue-50 rounded-xl p-4 sm:p-6 border border-blue-200">
+            <div className="bg-blue-50 rounded-xl p-4 sm:p-6 border border-blue-200 hover:bg-blue-100 transition-all duration-300 transform hover:scale-105">
               <div className="flex items-center mb-4">
-                <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-3" />
+                <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-3 animate-float" />
                 <h3 className="text-lg sm:text-xl font-bold text-blue-800">বাজার পরামর্শ / Market Advice</h3>
               </div>
               <ul className="space-y-2 sm:space-y-3">
                 <li className="flex items-start">
-                  <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0 animate-pulse" />
                   <span className="text-blue-700 text-sm sm:text-base">দাম তুলনা করে বিক্রয় করুন</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0 animate-pulse" />
                   <span className="text-blue-700 text-sm sm:text-base">Compare prices before selling</span>
                 </li>
               </ul>
@@ -630,44 +823,44 @@ function App() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mb-8 sm:mb-12">
             {/* Helpline */}
-            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg text-center hover:shadow-xl transition-shadow">
-              <div className="bg-green-100 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
-                <Phone className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-rotate-1">
+              <div className="bg-green-100 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center animate-pulse-scale">
+                <Phone className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 animate-float" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">হটলাইন / Hotline</h3>
               <p className="text-gray-600 mb-4 text-sm sm:text-base">২৪/৭ সেবা<br />24/7 Service</p>
-              <button className="text-xl sm:text-2xl font-bold text-green-600 hover:text-green-800 transition-colors">
+              <button className="text-xl sm:text-2xl font-bold text-green-600 hover:text-green-800 transition-all duration-300 hover:scale-110 animate-glow">
                 ১৬২৬৩
               </button>
               <p className="text-xs sm:text-sm text-gray-500 mt-2">বিনামূল্যে / Toll Free</p>
             </div>
 
             {/* SMS Service */}
-            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg text-center hover:shadow-xl transition-shadow">
-              <div className="bg-blue-100 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
-                <Smartphone className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <div className="bg-blue-100 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center animate-pulse-scale">
+                <Smartphone className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 animate-float" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">SMS সেবা / SMS Service</h3>
               <p className="text-gray-600 mb-4 text-sm sm:text-base">তাৎক্ষণিক তথ্য<br />Instant Information</p>
-              <p className="text-sm sm:text-lg font-bold text-blue-600">WEATHER পাঠান ১৬২৬৩ নম্বরে</p>
+              <p className="text-sm sm:text-lg font-bold text-blue-600">WEATHER পাঠান ১৬২৬ৃ নম্বরে</p>
               <p className="text-xs sm:text-sm text-gray-500 mt-2">Send WEATHER to 16263</p>
             </div>
 
             {/* Expert Consultation */}
-            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg text-center hover:shadow-xl transition-shadow md:col-span-2 lg:col-span-1">
-              <div className="bg-yellow-100 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
-                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600" />
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:rotate-1 md:col-span-2 lg:col-span-1">
+              <div className="bg-yellow-100 p-3 sm:p-4 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center animate-pulse-scale">
+                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600 animate-float" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">বিশেষজ্ঞ পরামর্শ / Expert Consultation</h3>
               <p className="text-gray-600 mb-4 text-sm sm:text-base">কৃষি বিশেষজ্ঞ<br />Agricultural Experts</p>
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 sm:px-6 py-2 rounded-full font-semibold transition-colors text-sm sm:text-base">
+              <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 sm:px-6 py-2 rounded-full font-semibold transition-all duration-300 text-sm sm:text-base hover:scale-110 animate-pulse-scale">
                 পরামর্শ নিন / Get Advice
               </button>
             </div>
           </div>
 
           {/* FAQ Section */}
-          <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg">
+          <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 text-center">
               সচরাচর জিজ্ঞাসা / Frequently Asked Questions
             </h3>
@@ -694,7 +887,7 @@ function App() {
                   a: 'হ্যাঁ, আমাদের সকল মৌলিক সেবা সম্পূর্ণ বিনামূল্যে।'
                 }
               ].map((faq, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+                <div key={index} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-all duration-300 transform hover:scale-105">
                   <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{faq.q}</h4>
                   <p className="text-xs sm:text-sm text-gray-600 mb-2 italic">{faq.qEn}</p>
                   <p className="text-gray-700 text-xs sm:text-sm">{faq.a}</p>
@@ -712,7 +905,7 @@ function App() {
             {/* Logo and Description */}
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-2 mb-4">
-                <Wheat className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-300" />
+                <Wheat className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-300 animate-float" />
                 <span className="text-white font-bold text-lg sm:text-xl">কৃষক সহায়ক</span>
               </div>
               <p className="text-green-100 mb-4 text-sm sm:text-base">
@@ -729,11 +922,11 @@ function App() {
             <div>
               <h3 className="text-base sm:text-lg font-semibold mb-4">দ্রুত লিংক / Quick Links</h3>
               <ul className="space-y-2">
-                <li><button onClick={() => scrollToSection('home')} className="text-green-200 hover:text-white transition-colors text-sm sm:text-base">হোম / Home</button></li>
-                <li><button onClick={() => scrollToSection('weather')} className="text-green-200 hover:text-white transition-colors text-sm sm:text-base">আবহাওয়া / Weather</button></li>
-                <li><button onClick={() => scrollToSection('crops')} className="text-green-200 hover:text-white transition-colors text-sm sm:text-base">ফসল / Crops</button></li>
-                <li><button onClick={() => scrollToSection('market')} className="text-green-200 hover:text-white transition-colors text-sm sm:text-base">বাজার / Market</button></li>
-                <li><button onClick={() => scrollToSection('support')} className="text-green-200 hover:text-white transition-colors text-sm sm:text-base">সহায়তা / Support</button></li>
+                <li><button onClick={() => scrollToSection('home')} className="text-green-200 hover:text-white transition-all duration-300 text-sm sm:text-base hover:scale-105">হোম / Home</button></li>
+                <li><button onClick={() => scrollToSection('weather')} className="text-green-200 hover:text-white transition-all duration-300 text-sm sm:text-base hover:scale-105">আবহাওয়া / Weather</button></li>
+                <li><button onClick={() => scrollToSection('crops')} className="text-green-200 hover:text-white transition-all duration-300 text-sm sm:text-base hover:scale-105">ফসল / Crops</button></li>
+                <li><button onClick={() => scrollToSection('market')} className="text-green-200 hover:text-white transition-all duration-300 text-sm sm:text-base hover:scale-105">বাজার / Market</button></li>
+                <li><button onClick={() => scrollToSection('support')} className="text-green-200 hover:text-white transition-all duration-300 text-sm sm:text-base hover:scale-105">সহায়তা / Support</button></li>
               </ul>
             </div>
 
@@ -742,15 +935,15 @@ function App() {
               <h3 className="text-base sm:text-lg font-semibold mb-4">যোগাযোগ / Contact</h3>
               <div className="space-y-3">
                 <div className="flex items-center">
-                  <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                  <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0 animate-pulse" />
                   <span className="text-green-200 text-sm sm:text-base">১৬২৬৩</span>
                 </div>
                 <div className="flex items-center">
-                  <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                  <Mail className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0 animate-pulse" />
                   <span className="text-green-200 text-xs sm:text-sm">info@krishoksahayak.gov.bd</span>
                 </div>
                 <div className="flex items-center">
-                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
+                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0 animate-pulse" />
                   <span className="text-green-200 text-sm sm:text-base">ঢাকা, বাংলাদেশ</span>
                 </div>
               </div>
@@ -765,9 +958,9 @@ function App() {
               </div>
               <div className="text-green-200 text-xs sm:text-sm text-center">
                 <div className="flex items-center justify-center space-x-2">
-                  <Heart className="h-3 w-3 sm:h-4 sm:w-4 text-red-400" />
+                  <Heart className="h-3 w-3 sm:h-4 sm:w-4 text-red-400 animate-pulse" />
                   <span>This project is designed and developed by</span>
-                  <strong className="text-yellow-300">Md Anamul Haque</strong>
+                  <strong className="text-yellow-300 animate-glow">Md Anamul Haque</strong>
                 </div>
                 <div className="text-center mt-1 text-xs text-green-300">
                   CS Engineer & UI/UX Designer
